@@ -26,7 +26,7 @@ typedef struct {
   double vy;
   double mass;
   //x,y värden (position)
-  //kraftvektor staffan was here
+  //kraftvektor staffan was here again
 } body;
 
 
