@@ -79,12 +79,14 @@ static void addForce(body* a, body* b)
   double distance = sqrt((xdist*xdist)+(ydist*ydist));
  
   if (distance > 0.0001){
-
-  
-  double force = (a->mass * b->mass)/distance;
+    
+    
+    double force = (a->mass * b->mass)/distance;
   a->fx -= force*xdist;
   a->fy -= force*ydist;
-}
+  b->fx += force*xdist;
+  b->fx += force*ydist;
+  }
 }
 
 
@@ -111,9 +113,9 @@ static void updateForces(int N, body* star)
 {
 
   // ett tidssteg
-  for (int i = 0; i < N; i++)
+  for (int i = N; i > 0; i--)
     {
-      for (int j = 0; j < N; j++)
+      for (int j = 0; j < i ; j++)
         {
           if (i != j )
             {
