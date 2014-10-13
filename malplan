@@ -1,0 +1,28 @@
+
+A3 när klart (Informationgsgömning, headerfiler)
+C7 (grupp) designmönster
+D9 dokumentera, lämpligen doxygen
+E10 voidpekare för genericitet
+G15 kopiering för att undvika aliasering
+H20 värde/referenssemantik   
+I22 defensiv programmering i ett program
+I23 fånga och hantera kontrollerade och okontrollerade undantag
+I24 olika metoder för felhantering och relatera till varandra
+J27 minneshantering i C; skriv program fritt från läckage
+K30-K32 (i en sitting) specifiera gränssnitt; coupling och cohesion; separation of concerns
+L33 - 35 Parallellisera ett tidigare program, mät körtiden och förklara, justera parametrar och mät och förklara igen
+M36 Översätt mellan pekare och array i C
+M37 skapa länkade strukturer
+M38 (med Nbody) pekare till stackvariabler för värdeöverföring mellan funktionsanrop
+M39 (måste komma på ett sätt att använda)
+Q47-49 (tillsammans med defensiv)
+S51 (tillsammans med dokumentation, .h)
+T54 dra nytta av emacs inbyggda stöd för programmering
+U55 (högprio)
+X59 +60(nästa gruppmöte)
+
+idag: H20 - värde/referens
+M38 - pekare till stackvariabler
+M39 - skapa en dynamisk array? - alt. T54 eller E10
+M36 - Pekare och arrayer -
+M37 - länkade strukturer -check, list and match
