@@ -1,5 +1,5 @@
 CC = gcc
-Cflags = -ggdb -pg -Wall -std=c99 -lm -o
+Cflags = -ggdb -Wall -std=c99 -o
 test: test.c
 	$(CC) $(Cflags) test test.c
 
@@ -20,3 +20,9 @@ prof: main-profil.c
 
 run:
 	main
+
+buss: graphlib.c
+	$(CC) $(Cflags) graphlib graphlib.c
+
+prov: kodprovskladd.c
+	$(CC) $(Cflags) kodprov kodprovskladd.c

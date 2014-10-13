@@ -2,6 +2,7 @@
 // inlï¿½sning frï¿½n fil; hur vet vi hur mÃ¥nga busshÃ¥llplatser/edges: lista Ã¶ver alla busshÃ¥lsplatser
 // bussfunktioner; dvs getweight och getdata, freeedge( för att ta bort edge_data
 // sï¿½kfunktion?
+// nod innehåller: namn, edgedata->edge_data (busslinje, tid, hållplatsnamn)
 // lista
 // noder innehÃ¥ller lista med {busslinje, tid, hÃ¥llplatsnamn}
 // hur rÃ¤kna grannar om trafik enkelriktad (lÃ¥gprio)
@@ -14,31 +15,28 @@
 
 #include <string.h> //EV ONÖDIG
 
+
+/* //generell
 typedef struct {
   void* edge_weight;
   void* edge_data;
 } edgedata;
-
+*/
 
 typedef struct {
-  char* name;
-  edgedata* edgelist;
-  list* nodelist;
-} node;
-
-
-//flytta senare över till egen .c
-typedef struct {
-  void* busslinje;
-  void* hÃ¥llplats;
+  int linje;
+  int tid;
+  char* hallplats;
 } bussedgen;
 
-typedef struct {
-  list* nextlist;
-  void* current;
-} list;
 
-node* newNode(char* name, edgedata* edgelist){
+//glöm inte att ändra när generellt
+typedef struct {
+  char* name;
+  bussedgen* grannar;
+} node;
+
+node* newNode(char* name, bussedgen* edgelist){
   node =  malloc(sizeof(node));
   node->name = name;
   node->edgelist = edgelist;
@@ -46,13 +44,12 @@ node* newNode(char* name, edgedata* edgelist){
 }
 
 
-void connectNodes(node node1, node node2){
+void connectNodes(node* node1, node* node2){
   //kolla om noderna finns i varandras listor (kÃ¤nner till varandra), om inte lï¿½gg till
-  void* searchtemp = node1->nodelist;
+  void* searchtemp = node1->bussedgen;
   int inlist = 0;
 
-  //for(void* searchtemp = node1->list;searchtemp->current =/= void*; searchtemp = node1->nodelist->next;){}
-  while(searchtemp->nextlist =/= void*){
+  while(searchtemp->){
     if (searchtemp == node2->name){
       inlist = 1;
     }
@@ -81,12 +78,12 @@ void connectNodes(node node1, node node2){
   //om namnet inte finns med
   if (inlist == 0){
     if (searchtemp->current == void){
-      node1->nodelist->current = node1->name;
+     searchtemp->current = node1->name;
     } //för tydlighet, EV ONÖDIG
   
     searchtemp->next = malloc(sizeof(list));
     searchtemp->next->current = malloc(sizeof((INT)strlen(node1->name)+1));  // EV ONÖDIG
-    node2->nodelist->current = node1->name;
+    searchtemp->current = node1->name;
   }
 }
 
@@ -122,10 +119,10 @@ void removeNode(node node){
     
   }
       
-  free(node);
+  free(node*);
 }
   
-
+/*
 edge* shortestPath(node from, node to){
 
   // vill ha två listor; en unvisited, en visited samt en variabel för varje nod, som är dess "avstånd"
@@ -163,12 +160,12 @@ edge* shortestPath(node from, node to){
   /*djikstras algoritm:
     Wikipedia*/  
   
-
    
-}
-
+//}
+/*
 void cleanup(){}//fundera på att adda; ta bort alla noder som inte sitter ihop med något?
 
 void main(){
   //skapa alla noder som poster i en lista
 }
+*/
