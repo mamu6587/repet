@@ -1,20 +1,13 @@
 // funktioner
 // inlï¿½sning frï¿½n fil; hur vet vi hur mÃ¥nga busshÃ¥llplatser/edges: lista Ã¶ver alla busshÃ¥lsplatser
 // bussfunktioner; dvs getweight och getdata, freeedge( för att ta bort edge_data
-// sï¿½kfunktion?
-// nod innehåller: namn, edgedata->edge_data (busslinje, tid, hållplatsnamn)
-// lista
-// noder innehÃ¥ller lista med {busslinje, tid, hÃ¥llplatsnamn}
 // hur rÃ¤kna grannar om trafik enkelriktad (lÃ¥gprio)
-// behöver vi använda strcmp etc eller räcker det med att jämföra minnesaddresser? när man matar in en sträng kan man ändå ta ut innehållet ur addressen och jämföra...
 // ha en stor lista med alla noder? skulle göra sökning otroligt mkt lättare... hur söka genom alla noder annars?
 // koppling mellan inläsning och nodskapande
-// ändra så att node->name inte är en char, utan en pekare till själva noden; annars måste jämföra på något annat sätt.
 // borde egentligen skapa ett separat list-bibliotek som man kan inkludera, och implementera funktioner såsom find, exists etc
 // vad ska connectnodes ta för data för tid och busslinje?
-// fixa så att removenode söker igenom hela nätet efter referenser till noden
-// ska hallplats vara en node* (alltså gå direkt till noden) eller en char* och gå till nodedata
-
+// glöm inte att fria listan varje gång man friar edge eller node
+// testa alla, skriv tester
 #include <string.h> //EV ONÖDIG
 #include <stdlib.h>
 
@@ -39,42 +32,34 @@ typedef struct {
 } node;
 
 typedef struct {
-  int linje;
-  int tid;
+  short linje;
+  short tid;
   node* hallplats;
 } bussedgen;
 
 
 
-node* newNode(char* name, list* edgelist){
+node* newNode(char* name){ //skapar en node med name name, returnerar en pekare till noden.
   node* nodepointer = malloc(sizeof(node));
   nodepointer->name = name;
-  //kan behövas en slags konstruktor här, som bygger upp bussedgen
 
   list* listpointer = malloc(sizeof(list));
   listpointer->current = nodepointer;
-  
-  bussedgen* edgepointer = malloc(sizeof(edgelist)+(sizeof(char)*(strlen(name))+1));
-  
-  
 
   return nodepointer;
 }
 
-void addEdge(node* node, bussedgen edge){//loopa igenom grannar till slutet och lägg till edgen där.
-  list* temp = node->grannar;
+void prependEdge(node* node, short linje, short tid, char* hallplats){//lägger till edge i början på node's edgelist
+  list* first = node->grannar;
 
-  for(list* temp = node->grannar;temp != NULL; temp = temp->next){}
-  //while(temp != NULL){temp = temp->next;}
-  temp = malloc(sizeof(list));
-  bussedgen* edgetemp = temp->current;
-  
-  
-
-
-}
-
-bussedgen* newEdge(int linje, int tid, node* node){
+ list* temp = malloc(sizeof(list));
+ temp->next = first;
+ node->grannar = temp;
+ bussedgen* edgetemp = malloc(sizeof(bussedgen));
+ temp->current = edgetemp;
+  edgetemp->hallplats = hallplats;
+  edgetemp->linje = linje;
+  edgetemp->tid = tid;
 }
 
 
@@ -95,7 +80,7 @@ void connectNodes(node* node1, node* node2){
 
   //om namnet inte finns med så lägg till den
   if (inlist == 0){
-    
+
     searchtemp->next = malloc(sizeof(list));
     listtemp = searchtemp->next;
     listtemp->current = malloc(sizeof(bussedgen)+sizeof(char)*(strlen(node2->name))); //kolla igenom
@@ -104,13 +89,13 @@ void connectNodes(node* node1, node* node2){
     //      searchtemp->next->current->hallplats = node2->name;
   }
 
-  
-  
+
+
   //om namnet finns med, sök igenom node2s lista efter node1
   inlist = 0;
   searchtemp = node2->grannar;
   edgetemp = searchtemp->current;
-        
+
   while(searchtemp->next != NULL){
     if (edgetemp->hallplats == node1){
       inlist = 1;
@@ -119,7 +104,7 @@ void connectNodes(node* node1, node* node2){
   }
   //om namnet inte finns med så lägg till den
   if (inlist == 0){
-          
+
     searchtemp->next = malloc(sizeof(list));
     listtemp = searchtemp->next;          //behövdes för att codeblocks var cp; testa bortkommenterade under
     listtemp->current = malloc(sizeof(bussedgen)+sizeof(char)*(strlen(node2->name)));
@@ -137,7 +122,7 @@ void connectNodes(node* node1, node* node2){
   }
 */
 
-void removeNode(list* nodelist, node* toRemove){ 
+void removeNode(list* nodelist, list* toRemove){
 
   //list är en lista av alla noder, node är noden som ska tas bort
   //kolla alla noder; ta bort noden frï¿½n allas listor och fria noden och edges
@@ -146,54 +131,80 @@ void removeNode(list* nodelist, node* toRemove){
   //när nodelist tom, fria och fria node; måste dessutom fria innehållet i edge
   //kolla om noden har några grannar; ska kolla från båda hållen, dvs söka igenom hela nätet?
 
+  node* nodetokill = toRemove->current; //att kolla mot
   list* searchtemp = nodelist;
-  node* nodepointer = searchtemp->current;
-  list* nexttemp = searchtemp->next;
-  
-  if(nodepointer == NULL) {} //ska inte hända, så kanske onödigt
-  
-  if(nodepointer == NULL) {} //detta är sista noden
-  
+  node* nodepointer = searchtemp->current;  // noden som söks igenom
+  list* prevtemp = NULL; // förra genomsökta, att använda för att länka över.
 
+  while(nodepointer != NULL){   //tills vi är i slutet av nodelist
+  if(nodepointer->name == toRemove->current) { //om det är noden, länka listan över den...
+        prevtemp->next = searchtemp->next;
+  }
+  list* grannarcurrent = nodepointer->grannar;
+  bussedgen* edgepointer = grannarcurrent->current;
+  list* grannarprev = NULL;
 
-
-
-
-
-
-
+    while(grannarcurrent != NULL){
+    if(nodetokill == edgepointer->hallplats){
+            grannarprev->next = grannarcurrent->next;
+        grannarprev = grannarcurrent;
+        grannarcurrent = grannarcurrent->next;
+        free(edgepointer);
+        free(grannarcurrent);
+        }
+        grannarprev = grannarcurrent;
+        grannarcurrent = grannarcurrent->next;
+    }
+  prevtemp = searchtemp;
+  searchtemp = searchtemp->next;
+  }
           //för varje loop, hoppa till nästa listpost; sluta efter loopen när sista är void(stämmer med for-loopen?)
           //searchtemp pekar alltså på nodens lista med noder, som innehåller pekare till grannoderna;
           //hitta noden i grannodens lista
           //måste alltså kolla nästa nod i kedjan?
 
-          // om noden är hittad, ta bort edgen, länka över, fria listan, edge
-          if(nexttemp->current == toRemove){
-            nodepointer = nexttemp->current;
-            //removeEdge(nexttemp->current,nodepointer->grannar);
-            searchtemp->next = nexttemp->next;//kommer funka även om nästa post är slutet
-
-
-          }
-
-          free(toRemove);
+          free(nodetokill);   //fria noden
+          free(toRemove);   //fria nodens listpost
         }
 
-        /*
-          edge* shortestPath(node from, node to){
+
+          list* shortestPath(list* nodelist, char* from, char* to){ //kommer bygga upp och returnera en lista, där varje post är edgen som ska tas från from för att komma till to
 
           // vill ha två listor; en unvisited, en visited samt en variabel för varje nod, som är dess "avstånd"
           // behöver egentligen bara en lista, med unvisited?
-          list* visited = ;
-          list* unvisited = globalnodelist; //alla noder skall börja häri
-          //alla noder skall ha en "oändlig" distance från start
+          // gör en int array med tre inlägg; node* (pekare till noden, används som ID), visited (0 eller 1), tentative distance (börjar på -1)
+          int numberOfNodes = 0;
+          list* listtemp = nodelist;
+          while(nodelist != NULL){
+            listtemp = listtemp->next;
+            numberOfNodes++;
+          }
+        int* start;
+        node* nodeAddress;
+          int listnodes[numberOfNodes][3]; //alla noder skall börja häri
+                                    //alla noder skall ha -1 distance från start
+        for(int i = 0;i < numberOfNodes;i++){//initialisera arrayen till (nod*, 0, if(from){0} else -1)
 
-          node* current = from;
+        //listnodes[i][0] = ((int)*nodeAddress); //Kan behöva lösas med lite god pekararitmetik;
+                listnodes[i][1] = 0;
+                            if(nodeAddress->name == from){ //hur få tag i noden här?
+                            listnodes[i][2] = 0;
+                            start = listnodes[i];
+                            }
+                        listnodes[i][2] = -1;
+        }
+
+            nodeAddress = &start;
+          int* currentnode = start;
           int startToHere = 0;
 
           //jämför avstånd till alla obesökta grannar från current, beräkna deras avstånd från start, och ge dem det lägsta om nuvarande är högre
           //om grannen är obesökt; beräkna avstånd från start;
-          if(
+          //ta ut en granne
+          list* edgelistlooptemp = nodeAddress->grannar;
+          bussedgen* edgeaccesstemp = edgelistlooptemp->current;
+          while (edgelistlooptemp->next != NULL){ //bättre att loopa på denna då den är kortare
+          for(int i = 0; i < numberOfNodes; i++);if(listnodes[i][0] == &
 
           ){
           if(from->edgelist->edge_weight => *****LÄNGDVARIABEL*****
@@ -203,7 +214,7 @@ void removeNode(list* nodelist, node* toRemove){
           }
 
           }
-
+          }
           //ta bort noden från unvisited
 
           //om målnoden är besökt
@@ -213,17 +224,14 @@ void removeNode(list* nodelist, node* toRemove){
 
           //annars välj den obesökta noden med minst avstånd och börja om.
 
-
+/*
           djikstras algoritm:
           Wikipedia
 
 
         //}
-        
-          void cleanup(){}//fundera på att adda; ta bort alla noder som inte sitter ihop med något?
 
           void constructGraph(){
-
           //skapa alla noder som poster i en lista
           }
         */
