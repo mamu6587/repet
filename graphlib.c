@@ -201,12 +201,12 @@ void removeNode(list* nodelist, list* toRemove){
           //jämför avstånd till alla obesökta grannar från current, beräkna deras avstånd från start, och ge dem det lägsta om nuvarande är högre
           //om grannen är obesökt; beräkna avstånd från start;
           //ta ut en granne
-          list* edgelistlooptemp = nodeAddress->grannar;
-          bussedgen* edgeaccesstemp = edgelistlooptemp->current;
-          while (edgelistlooptemp->next != NULL){ //bättre att loopa på denna då den är kortare
-          for(int i = 0; i < numberOfNodes; i++);if(listnodes[i][0] == &
+          list* edgelistlooptemp = nodeAddress->grannar;    // edgelistlooptemp pekar på startnodens grannar
+          bussedgen* edgeaccesstemp = edgelistlooptemp->current; // edgeaccesstemp används för att komma åt varje bussedgen
+          while (edgelistlooptemp->next != NULL){ //
+          for(int i = 0; i < numberOfNodes; i++){if(listnodes[i][0] == edgeaccesstemp->hallplats} //vad försöker jag göra här egentligen
 
-          ){
+
           if(from->edgelist->edge_weight => *****LÄNGDVARIABEL*****
           ){
           ******LÄNGDVARIABEL********
