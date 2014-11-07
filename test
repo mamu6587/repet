@@ -1,0 +1,94 @@
+
+granularity: each sample hit covers 4 byte(s) for 0.79% of 1.26 seconds
+
+                                  called/total       parents 
+index  %time    self descendents  called+self    name    	index
+                                  called/total       children
+
+                0.00        1.19       1/1           _start [2]
+[1]     94.4    0.00        1.19       1         main [1]
+                0.08        1.10    1000/1000        updateForces [3]
+                0.01        0.00       1/1           init [6]
+                0.00        0.00    1001/1001        copyToXBuffer [9]
+
+-----------------------------------------------
+
+                                                     <spontaneous>
+[2]     94.4    0.00        1.19                 _start [2]
+                0.00        1.19       1/1           main [1]
+
+-----------------------------------------------
+
+                0.08        1.10    1000/1000        main [1]
+[3]     93.7    0.08        1.10    1000         updateForces [3]
+                1.10        0.00 20100000/20100000     addForce [4]
+                0.00        0.00  200000/200000      update [8]
+
+-----------------------------------------------
+
+                1.10        0.00 20100000/20100000     updateForces [3]
+[4]     87.3    1.10        0.00 20100000         addForce [4]
+
+-----------------------------------------------
+
+                                                     <spontaneous>
+[5]      5.6    0.07        0.00                 internal_mcount [5]
+
+-----------------------------------------------
+
+                0.01        0.00       1/1           main [1]
+[6]      0.8    0.01        0.00       1         init [6]
+                0.00        0.00     200/202         newRand [10]
+
+-----------------------------------------------
+
+                0.00        0.00  200000/200000      update [8]
+[7]      0.0    0.00        0.00  200000         resetForce [7]
+
+-----------------------------------------------
+
+                0.00        0.00  200000/200000      updateForces [3]
+[8]      0.0    0.00        0.00  200000         update [8]
+                0.00        0.00  200000/200000      resetForce [7]
+                0.00        0.00       2/202         newRand [10]
+
+-----------------------------------------------
+
+                0.00        0.00    1001/1001        main [1]
+[9]      0.0    0.00        0.00    1001         copyToXBuffer [9]
+
+-----------------------------------------------
+
+                0.00        0.00       2/202         update [8]
+                0.00        0.00     200/202         init [6]
+[10]     0.0    0.00        0.00     202         newRand [10]
+
+-----------------------------------------------
+
+
+
+granularity: each sample hit covers 4 byte(s) for 0.78% of 1.28 seconds
+
+   %  cumulative    self              self    total          
+ time   seconds   seconds    calls  ms/call  ms/call name    
+ 85.9       1.10     1.10 20100000     0.00     0.00  addForce [4]
+  6.2       1.18     0.08     1000     0.08     1.18  updateForces [3]
+  5.5       1.25     0.07                            internal_mcount [5]
+  0.8       1.26     0.01        1    10.00    10.00  init [6]
+  0.8       1.27     0.01                            _mcount (24)
+  0.0       1.27     0.00   200000     0.00     0.00  resetForce [7]
+  0.0       1.27     0.00   200000     0.00     0.00  update [8]
+  0.0       1.27     0.00     1001     0.00     0.00  copyToXBuffer [9]
+  0.0       1.27     0.00      202     0.00     0.00  newRand [10]
+  0.0       1.27     0.00        1     0.00  1190.00  main [1]
+
+Index by function name
+
+  (24) _mcount               [5] internal_mcount       [8] update             
+   [4] addForce              [1] main                  [3] updateForces       
+   [9] copyToXBuffer        [10] newRand            
+   [6] init                  [7] resetForce         
+
+Object modules
+
+ 1: mainprof
