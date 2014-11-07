@@ -43,6 +43,7 @@ char* shortestPath(char *h1, char *h2, int traveltime, int buschanges, int line)
       struct neighbor *tempNeighbor = tempNode->firstNeighbor;
       while(tempNeighbor->next != NULL)
         {
+          //Problem: oändlig loop när h1 och h2 är grannar till varandra
           int time = traveltime + tempNeighbor->time;
           int tempLine = tempNeighbor->line;
           int changes;
@@ -57,14 +58,19 @@ char* shortestPath(char *h1, char *h2, int traveltime, int buschanges, int line)
               changes = buschanges;
             }
 
-          shortestPath(tempNeighbor->name, h2, time, changes, tempLine);
-             
           //kolla alla grannar var de går, osv i en loop
           if(!strcmp(h2, tempNeighbor->name))
             {
               // Samla ihop all data om eventuella byten och sedan jämför snabbaste
               printf("Hittade %s här: %s - Resetid: %d minuter - Antal byten: %d\n", h2, tempNode->name, time, changes - 1); 
             }
+          else
+            {
+              shortestPath(tempNeighbor->name, h2, time, changes, tempLine);
+            }
+            
+            
+
           tempNeighbor = tempNeighbor->next;
         }
       return "End of search";
@@ -226,6 +232,6 @@ int main()
     }
     
   puts("Buss mellan Vaksala torg och Prastgardsgatan:");
-  puts(shortestPath("Luthagsesplanaden", "Prastgardsgatan", 0, 0, 0));
+  puts(shortestPath("Biomedicinskt centrum", "Granby Centrum", 0, 0, 0));
   return 0;
 }
