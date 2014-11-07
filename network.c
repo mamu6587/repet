@@ -232,6 +232,6 @@ int main()
     }
     
   puts("Buss mellan Vaksala torg och Prastgardsgatan:");
-  puts(shortestPath("Biomedicinskt centrum", "Granby Centrum", 0, 0, 0));
+  puts(shortestPath("Graalsvagen", "Robo", 0, 0, 0));
   return 0;
 }
