@@ -12,4 +12,14 @@ to the physical laws of the universe.
 
 Compile the program
 ===================
-There are two ma
+
+Compile for star simulation:
+make starsim
+
+Compile for animation:
+make animate
+
+Run the program
+===============
+
+make run
