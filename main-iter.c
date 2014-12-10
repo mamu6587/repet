@@ -14,7 +14,7 @@
 
 #define prec float
 
-static prec gdt = 0.01;
+static prec gdt = 0.001;
 
 typedef struct {
   short x;
@@ -53,16 +53,6 @@ static void resetForce(body* b) {
  */
 static void update(body* a, prec dt)
 {
-
-  /*if((a->x < -400 )||(a->y < -400)){ vad är detta för bortkommenterat skit? : )  
-    a->vx = newRand();
-    a->vy = newRand();
-    a->x = 400;
-    a->y = 400;
-    resetForce(a);
-    return;
-    }*/
-  
   a->vx += a->fx*dt;
   a->vy += a->fy*dt;
   a->x += a->vx*dt + (a->fx*dt*dt)/2;
@@ -81,7 +71,7 @@ static void addForce(body* a, body* b)
 {
   double ydist = (a->y - b->y);
   double xdist = (a->x - b->x);
-  double distance = sqrt((xdist*xdist)+(ydist*ydist));
+  double distance = 1.0f/sqrt((xdist*xdist)+(ydist*ydist));
  
   if (distance > 0.0001){
     double force = (a->mass * b->mass)/distance;
@@ -89,8 +79,6 @@ static void addForce(body* a, body* b)
     a->fy -= force*ydist;
   }
 }
-
-
 
 /**
  * Initialise a number of bodies in an array of bodies
@@ -102,8 +90,8 @@ void init(int* N, body* star)
   // printf("int N i init: %d\n", *N);
   for (int i = 0; i < *N; i++)
    {
-     star[i].x = 100 + (rand() % 200); 
-     star[i].y = 100 + (rand() % 200);
+     star[i].x = 200 + (rand() % 400); 
+     star[i].y = 200 + (rand() % 400);
      star[i].vx = 0;
      star[i].vy = 0;
      star[i].fx = 0;
