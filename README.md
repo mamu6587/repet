@@ -13,7 +13,7 @@ to the physical laws of the universe.
 Compile the program
 ===================
 
-Compile for star simulation:
+Compile for benchmarking the star simulation without animation:
 make starsim
 
 Compile for animation:
@@ -22,4 +22,11 @@ make animate
 Run the program
 ===============
 
-make run
+If no arguments are given to the program it runs with default values 200 bodies 
+and 1000 iterations
+
+To run the program with default values:
+./main
+
+To run the program With custom values:
+./main [number of bodies] [number of iterations]

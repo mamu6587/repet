@@ -212,6 +212,7 @@ int main(int argc, char* argv[]) {
 #ifdef ANIMATE
   XCloseDisplay(disp);
   free(points);
+  free(gc);
 #endif
 
   free(star);
