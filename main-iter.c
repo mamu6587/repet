@@ -72,12 +72,11 @@ static void addForce(body* a, body* b)
   double ydist = (a->y - b->y);
   double xdist = (a->x - b->x);
   double distance = 1.0f/sqrt((xdist*xdist)+(ydist*ydist));
+  
+  double force = (a->mass * b->mass)/distance;
+  a->fx -= force*xdist;
+  a->fy -= force*ydist;
  
-  if (distance > 0.0001){
-    double force = (a->mass * b->mass)/distance;
-    a->fx -= force*xdist;
-    a->fy -= force*ydist;
-  }
 }
 
 /**
@@ -159,13 +158,14 @@ int main(int argc, char* argv[]) {
       N = atoi(*(argv + 1));
       iter = atoi(argv[2]);
     }
+
   assert(N > 0);
   assert(iter > 0);
   
   body* star = malloc(sizeof(body) * N); // skapa array av stjärnor
   // printf("pekare till stackvariabel N: %p\n", &N);
   init(&N, star);
-  // staffan testar att översätta mellan array-notation och pekararitmetik
+  // testar att översätta mellan array-notation och pekararitmetik
   //printf("%p ska vara lika som: %p\n", star, &star[0]);
   //printf("%p ska vara lika som: %p\n", (star + 1), &star[1]);
 
