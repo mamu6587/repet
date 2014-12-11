@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <assert.h>
 
 #ifdef ANIMATE
 #include <X11/Xlib.h>
@@ -12,12 +13,8 @@
 #endif
 
 #define prec float
-#define PI 3.14159265359
-#define gconst 6.673 // gravitationskonstanten, vad ska den vara?
 
-
-
-static prec gdt = 0.01;
+static prec gdt = 0.001;
 
 typedef struct {
   short x;
@@ -27,90 +24,89 @@ typedef struct {
   double vx;
   double vy;
   double mass;
-  //x,y värden (position)
-  //kraftvektor staffan was here again
 } body;
 
-
+/**
+ * Randomise a float number between 1 and 0
+ * @return randomised number
+ */
 static prec newRand()
 {
   prec r = (prec)((double)rand()/(double)RAND_MAX);
+  assert(r <= 1 && r > 0);
   return r;
 }
 
-
+/**
+ * Set the force of a body to 0
+ * @param b the affected body
+ */
 static void resetForce(body* b) {
   b->fx = 0;
   b->fy = 0;
 }
 
+/**
+ * Update position and force of a body in a timespan
+ * @param a the affected body
+ * @param dt timespan
+ */
 static void update(body* a, prec dt)
 {
-
-  if((a->x < -400 )||(a->y < -400)){  
-    a->vx = newRand();//a->mass;
-    a->vy = newRand();//a->mass;
-    a->x = 400;
-    a->y = 400;
-    resetForce(a);
-    return;
-  }
-  
-  a->vx += a->fx*dt;//a->mass;
-  a->vy += a->fy*dt;//a->mass;
+  a->vx += a->fx*dt;
+  a->vy += a->fy*dt;
   a->x += a->vx*dt + (a->fx*dt*dt)/2;
   a->y += a->vy*dt + (a->fy*dt*dt)/2;
     
   resetForce(a);
-    // update_all_positions();  // update_all_positions();
-  //clock_t start = clock();
-  //clock_t step += 0.0001
-  
-  //start = nu
-  //if nu = start+gdt, then update
 }
-//uppdaterar stjärnorna varje tick
 
-
+/**
+ * Calculates the gravitational forces between two bodies and 
+ * updates their forces accordingly
+ * @param a the first body
+ * @param b the second body
+ */
 static void addForce(body* a, body* b)
 {
   double ydist = (a->y - b->y);
   double xdist = (a->x - b->x);
-  double distance = sqrt((xdist*xdist)+(ydist*ydist));
+  double distance = 1.0f/sqrt((xdist*xdist)+(ydist*ydist));
  
   if (distance > 0.0001){
-
-  
-  double force = (a->mass * b->mass)/distance;
-  a->fx -= force*xdist;
-  a->fy -= force*ydist;
-}
+    double force = (a->mass * b->mass)/distance;
+    a->fx -= force*xdist;
+    a->fy -= force*ydist;
+  }
 }
 
-
-
-
-void init(int N, body* star)
+/**
+ * Initialise a number of bodies in an array of bodies
+ * @param N number of bodies to be initalised
+ * @param star array of bodies
+ */
+void init(int* N, body* star)
 {
-  // skapa stjärnor
-  // skapa array av bodies, malloc sizeof(body)
-  for (int i = 0; i < N; i++)
+  // printf("int N i init: %d\n", *N);
+  for (int i = 0; i < *N; i++)
    {
-     star[i].x = 100 + (rand() % 200); // random number between 350-450; 
-     star[i].y = 100 + (rand() % 200);
-     star[i].vx = 0;//newRand(); // Vad ska vx slumpas till?
-     star[i].vy = 0;//newRand();
+     star[i].x = 200 + (rand() % 400); 
+     star[i].y = 200 + (rand() % 400);
+     star[i].vx = 0;
+     star[i].vy = 0;
      star[i].fx = 0;
      star[i].fy = 0;
      star[i].mass = newRand();
    }
 }
-// kör newRand N gånger, sparar/skapar resultatet i en array med stjärnor
 
+/**
+ * Updates forces and positions of bodies
+ * @param N number of bodies to be updated
+ * @param star array of bodies to be updated
+ */
 static void updateForces(int N, body* star)
 {
-
-  // ett tidssteg
   for (int i = 0; i < N; i++)
     {
       for (int j = 0; j < N; j++)
@@ -118,55 +114,61 @@ static void updateForces(int N, body* star)
           if (i != j )
             {
 	      addForce(&star[i],&star[j]);
-	      
-              // star[i]->x += calculate force x(i, j)
-              // star[j]->y += calculate force y(i,j)
             }
         }
-    
     }
 
   for(int k = 0; k < N; k++){
     update(&star[k],gdt);
-  }
-  // update_all_positions  
-  
+  }  
 }
 
-// tar in en kraft N och arrayen med stjärnor. uppdaterar varje stjärnas kraft
-  
-  
-  // Manually copy coordinates from stars into points (to be drawn).
-  // Look at the manual file for XPoint to see which
-  // format XPoint accepts its coordinates in.
+
 #ifdef ANIMATE
+/**
+ * Copy the coordinates of stars into points to be drawn
+ * Formatted for being viewed in XPoint (see XPoint manual)
+ * @param star array of bodies to be drawn
+ * @param points XPoint coordinates
+ * @param N number of bodies
+ */
 static void copyToXBuffer(body* star, XPoint* points, int N)
 {
-
   for(int i = 0; i < N; i++) {
     points[i].x = star[i].x;
     points[i].y = star[i].y;
-    }
-  // översätt koordinater till xpointkoordinater
+  }
 }
 #endif
  
- int main(int argc, char* argv[]) {
-   
-   int N = 200;
+/**
+ * Start simulation of bodies in space
+ * Prints time, number of bodies and number of iterations
+ * @param argc number of arguments
+ * @param argv[] array of arguments
+ * @return 0 when finished
+ */
+int main(int argc, char* argv[]) {
+
+  int N = 200;
   int iter = 1000;
 
   if(argc == 3)
     {
-      N = atoi(argv[1]);
+      //printf("%p börjar argv\n +1 = %p ska vara lika som: %p\n", argv, argv + 1, &argv[1]);
+      N = atoi(*(argv + 1));
       iter = atoi(argv[2]);
     }
+  assert(N > 0);
+  assert(iter > 0);
   
   body* star = malloc(sizeof(body) * N); // skapa array av stjärnor
-  init(N, star);
-  printf("antal stars: %d\nstar[18]: %d, %d. \nstar[190]: %d, %d\n", N, 
-	 star[18].x, star[18].y, star[190].x, star[190].y); 
-  // två test-star för att se vad som finns
+  // printf("pekare till stackvariabel N: %p\n", &N);
+  init(&N, star);
+  // staffan testar att översätta mellan array-notation och pekararitmetik
+  //printf("%p ska vara lika som: %p\n", star, &star[0]);
+  //printf("%p ska vara lika som: %p\n", (star + 1), &star[1]);
+
 
 #ifdef ANIMATE
   XPoint* points = malloc(sizeof(XPoint)*N);
@@ -209,9 +211,9 @@ static void copyToXBuffer(body* star, XPoint* points, int N)
 
 #ifdef ANIMATE
   XCloseDisplay(disp);
+  free(points);
 #endif
 
-  free(points);
   free(star);
   return 0;
 }
