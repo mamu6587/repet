@@ -1,11 +1,20 @@
-#include "./../main-iter.c"
 #include "CUnit/Basic.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
+#define prec float
 
+typedef struct {
+  short x;
+  short y;
+  double fx;
+  double fy;
+  double vx;
+  double vy;
+  double mass;
+} body;
 
 //test-help functions
 void setbody(body* c, short a, short b){
