@@ -1,0 +1,138 @@
+\hypertarget{main-iter_8c}{
+\section{main-iter.c File Reference}
+\label{main-iter_8c}\index{main-iter.c@{main-iter.c}}
+}
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$time.h$>$}\par
+{\tt \#include $<$assert.h$>$}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \textbf{body}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{main-iter_8c_4c01dcca324ecd28bf0f7dbd30b6c007}{
+\#define \textbf{prec}~float}
+\label{main-iter_8c_4c01dcca324ecd28bf0f7dbd30b6c007}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+static prec \hyperlink{main-iter_8c_656b0e6c956991a96f0f8aa88341f618}{newRand} ()
+\item 
+static void \hyperlink{main-iter_8c_3c505f52b191ad162e80d25858fdd098}{resetForce} (body $\ast$b)
+\item 
+static void \hyperlink{main-iter_8c_fc1da57b3f4ebfb1c6f700fe25845bc2}{update} (body $\ast$a, prec dt)
+\item 
+static void \hyperlink{main-iter_8c_e6e907402026ca4699b0da99978b5be7}{addForce} (body $\ast$a, body $\ast$b)
+\item 
+void \hyperlink{main-iter_8c_ce5e968cf7efbcb4411b217c194a9646}{init} (int $\ast$N, body $\ast$star)
+\item 
+static void \hyperlink{main-iter_8c_0225871a22ae8ff450368514791f150e}{updateForces} (int N, body $\ast$star)
+\item 
+int \hyperlink{main-iter_8c_0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{main-iter_8c_1fbf28d851e0c80a478859ec0c539a5a}{
+static prec \textbf{gdt} = 0.001}
+\label{main-iter_8c_1fbf28d851e0c80a478859ec0c539a5a}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{Desc}
+\item[Author:]Staffan Edstrom, Magnus Muhr \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{main-iter_8c_e6e907402026ca4699b0da99978b5be7}{
+\index{main-iter.c@{main-iter.c}!addForce@{addForce}}
+\index{addForce@{addForce}!main-iter.c@{main-iter.c}}
+\subsubsection[{addForce}]{\setlength{\rightskip}{0pt plus 5cm}static void addForce (body $\ast$ {\em a}, \/  body $\ast$ {\em b})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{main-iter_8c_e6e907402026ca4699b0da99978b5be7}
+
+
+Calculates the gravitational forces between two bodies and updates their forces accordingly \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em a}]the first body \item[{\em b}]the second body \end{description}
+\end{Desc}
+\hypertarget{main-iter_8c_ce5e968cf7efbcb4411b217c194a9646}{
+\index{main-iter.c@{main-iter.c}!init@{init}}
+\index{init@{init}!main-iter.c@{main-iter.c}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}void init (int $\ast$ {\em N}, \/  body $\ast$ {\em star})}}
+\label{main-iter_8c_ce5e968cf7efbcb4411b217c194a9646}
+
+
+Initialise a number of bodies in an array of bodies \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em N}]number of bodies to be initalised \item[{\em star}]array of bodies \end{description}
+\end{Desc}
+\hypertarget{main-iter_8c_0ddf1224851353fc92bfbff6f499fa97}{
+\index{main-iter.c@{main-iter.c}!main@{main}}
+\index{main@{main}!main-iter.c@{main-iter.c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (int {\em argc}, \/  char $\ast$ {\em argv}\mbox{[}$\,$\mbox{]})}}
+\label{main-iter_8c_0ddf1224851353fc92bfbff6f499fa97}
+
+
+Start simulation of bodies in space Prints time, number of bodies and number of iterations \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em argc}]number of arguments \item[{\em argv\mbox{[}$\,$\mbox{]}}]array of arguments \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 when finished \end{Desc}
+\hypertarget{main-iter_8c_656b0e6c956991a96f0f8aa88341f618}{
+\index{main-iter.c@{main-iter.c}!newRand@{newRand}}
+\index{newRand@{newRand}!main-iter.c@{main-iter.c}}
+\subsubsection[{newRand}]{\setlength{\rightskip}{0pt plus 5cm}static prec newRand ()\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{main-iter_8c_656b0e6c956991a96f0f8aa88341f618}
+
+
+Randomise a float number between 1 and 0 \begin{Desc}
+\item[Returns:]randomised number \end{Desc}
+\hypertarget{main-iter_8c_3c505f52b191ad162e80d25858fdd098}{
+\index{main-iter.c@{main-iter.c}!resetForce@{resetForce}}
+\index{resetForce@{resetForce}!main-iter.c@{main-iter.c}}
+\subsubsection[{resetForce}]{\setlength{\rightskip}{0pt plus 5cm}static void resetForce (body $\ast$ {\em b})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{main-iter_8c_3c505f52b191ad162e80d25858fdd098}
+
+
+Set the force of a body to 0 \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em b}]the affected body \end{description}
+\end{Desc}
+\hypertarget{main-iter_8c_fc1da57b3f4ebfb1c6f700fe25845bc2}{
+\index{main-iter.c@{main-iter.c}!update@{update}}
+\index{update@{update}!main-iter.c@{main-iter.c}}
+\subsubsection[{update}]{\setlength{\rightskip}{0pt plus 5cm}static void update (body $\ast$ {\em a}, \/  prec {\em dt})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{main-iter_8c_fc1da57b3f4ebfb1c6f700fe25845bc2}
+
+
+Update position and force of a body in a timespan \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em a}]the affected body \item[{\em dt}]timespan \end{description}
+\end{Desc}
+\hypertarget{main-iter_8c_0225871a22ae8ff450368514791f150e}{
+\index{main-iter.c@{main-iter.c}!updateForces@{updateForces}}
+\index{updateForces@{updateForces}!main-iter.c@{main-iter.c}}
+\subsubsection[{updateForces}]{\setlength{\rightskip}{0pt plus 5cm}static void updateForces (int {\em N}, \/  body $\ast$ {\em star})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{main-iter_8c_0225871a22ae8ff450368514791f150e}
+
+
+Updates forces and positions of bodies \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em N}]number of bodies to be updated \item[{\em star}]array of bodies to be updated \end{description}
+\end{Desc}

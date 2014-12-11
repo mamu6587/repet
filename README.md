@@ -28,8 +28,12 @@ and 1000 iterations
 To run the program with default values:
 ./main
 
-To run the program with custom values:
-./main [number of bodies] [number of iterations]
+To run the program with custom values,
+N and iter must be a positive integer:
+./main [N number of bodies] [iter number of iterations]
+
+To run the tests:
+make runtest
 
 Documentation
 -------------

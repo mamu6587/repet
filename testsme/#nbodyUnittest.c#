@@ -33,9 +33,9 @@ int clean_suite1(void){
 
 
 //funktioner att testa:
-//initierar 10 stjärnor och sätter deras värden till 1
-//sedan kör vi init på samma star-array och kontrollerar
-//att alla värden har ändrats till tillåtna värden
+//initierar 10 stjÃ¤rnor och sÃ¤tter deras vÃ¤rden till 1
+//sedan kÃ¶r vi init pÃ¥ samma star-array och kontrollerar
+//att alla vÃ¤rden har Ã¤ndrats till tillÃ¥tna vÃ¤rden
 
 void testinit(){
   body* initbody = calloc(10,sizeof(body));
@@ -65,9 +65,9 @@ void testinit(){
 
 void testupdate(){
   //  void update(body* a, prec dt)
-  // x & y ska inte få vara för stora eller för små för att testa if;
-  // kolla att den uppdaterar ordentligt, frågan är hur: kolla att inte samma?
-  // kolla för både positiva och negativa värden på allt.
+  // x & y ska inte fÃ¥ vara fÃ¶r stora eller fÃ¶r smÃ¥ fÃ¶r att testa if;
+  // kolla att den uppdaterar ordentligt, frÃ¥gan Ã¤r hur: kolla att inte samma?
+  // kolla fÃ¶r bÃ¥de positiva och negativa vÃ¤rden pÃ¥ allt.
   int wat = 4;
   body* stars = calloc(wat,sizeof(body));
   //malloc(sizeof(body)* 8);
@@ -79,22 +79,22 @@ void testupdate(){
   for(int i = 0; i < wat; i++){
     setbodypos(&stars[i],400,400);  
   }
-  //0 ska åka rakt höger
+  //0 ska Ã¥ka rakt hÃ¶ger
   stars[0].fx = 5;
   stars[0].fy = 0;
   stars[0].vx = 10;
   stars[0].vy = 0;
-  //1 ska åka rakt vänster
+  //1 ska Ã¥ka rakt vÃ¤nster
   stars[1].fx = -5;
   stars[1].fy = 0;
   stars[1].vx = -10;
   stars[1].vy = 0;
-  //2 ska åka rakt upp
+  //2 ska Ã¥ka rakt upp
   stars[2].fx = 0;
   stars[2].fy = 5;
   stars[2].vx = 0;
   stars[2].vy = 10;
-  //3 ska åka rakt ner
+  //3 ska Ã¥ka rakt ner
   stars[3].fx = 0;
   stars[3].fy = -5;
   stars[3].vx = 0;
@@ -114,22 +114,22 @@ void testupdate(){
 }
 
 /**
-   Skapar två array av stars
-   En av arrayerna innehåller en star med 100x större massa än de andra
-   Kör addforce mellan de två stjärnorna i varje array
-   Kollar så att det skapas kraft 
-   Kollar så att de dras mot varandra
-   Kollar så att stjärnan med stor massa påverkar kraften mer än de andra
+   Skapar tvÃ¥ array av stars
+   En av arrayerna innehÃ¥ller en star med 100x stÃ¶rre massa Ã¤n de andra
+   KÃ¶r addforce mellan de tvÃ¥ stjÃ¤rnorna i varje array
+   Kollar sÃ¥ att det skapas kraft 
+   Kollar sÃ¥ att de dras mot varandra
+   Kollar sÃ¥ att stjÃ¤rnan med stor massa pÃ¥verkar kraften mer Ã¤n de andra
  */
 void testaddForce(){
   //  void addForce(body* a, body* b)
-  //skall testa den vanliga logiken och även distance-if-satsen
+  //skall testa den vanliga logiken och Ã¤ven distance-if-satsen
 
   body* stars = calloc(2,sizeof(body));
   body* stars2 = calloc(2,sizeof(body));
   //malloc(sizeof(body) * 4);
 
-  //kolla först att den sätter kraften rätt mellan två kroppar
+  //kolla fÃ¶rst att den sÃ¤tter kraften rÃ¤tt mellan tvÃ¥ kroppar
   for(int i = 0; i < 2; i++){
     stars[i].mass = 1;
     stars2[i].mass = 1+ i*100;
@@ -156,13 +156,13 @@ void testaddForce(){
 
 
 /**
-   Skapar en array av 3 stjärnor
-   Kör updateForces där vi uppdaterar alla stjärnors kraft och position
+   Skapar en array av 3 stjÃ¤rnor
+   KÃ¶r updateForces dÃ¤r vi uppdaterar alla stjÃ¤rnors kraft och position
    
  */
 void testupdateForces(){
   //  updateForces(int N, body* star)
-  // kolla att alla värden ändras på båda i paret
+  // kolla att alla vÃ¤rden Ã¤ndras pÃ¥ bÃ¥da i paret
 
   int num = 3;
 
@@ -184,7 +184,7 @@ void testupdateForces(){
   test1 = copybody(stars[0]);
   test2 = copybody(stars[1]);
   test3 = copybody(stars[2]);
-
+  
   int i = 0;
   while( i< 50 ){
     updateForces(3, stars);
@@ -199,7 +199,7 @@ void testupdateForces(){
   CU_ASSERT(test1->vx != stars[0].vx);
   CU_ASSERT(test1->vy != stars[0].vy);
 
-  //stars1 är stilla
+  //stars1 Ã¤r stilla
   CU_ASSERT(test2->x == stars[1].x);
   CU_ASSERT(test2->y == stars[1].y);
 

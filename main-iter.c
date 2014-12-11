@@ -4,6 +4,7 @@
 #include <time.h>
 #include <assert.h>
 
+
 #ifdef ANIMATE
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -60,8 +61,8 @@ static void update(body* a, prec dt)
 {
   a->vx += a->fx*dt;
   a->vy += a->fy*dt;
-  a->x += a->vx*dt + (a->fx*dt*dt)/2;
-  a->y += a->vy*dt + (a->fy*dt*dt)/2;
+  a->x += (int)(a->vx*dt + (a->fx*dt*dt)/2);
+  a->y += (int)(a->vy*dt + (a->fy*dt*dt)/2);
     
   resetForce(a);
 }
@@ -74,14 +75,16 @@ static void update(body* a, prec dt)
  */
 static void addForce(body* a, body* b)
 {
+
   double ydist = (a->y - b->y);
   double xdist = (a->x - b->x);
   double distance = 1.0f/sqrt((xdist*xdist)+(ydist*ydist));
-  
+    
   double force = (a->mass * b->mass)/distance;
   a->fx -= force*xdist;
   a->fy -= force*ydist;
- 
+  b->fx += force*xdist;
+  b->fy += force*ydist;
 }
 
 /**
@@ -152,6 +155,8 @@ static void copyToXBuffer(body* star, XPoint* points, int N)
  * @param argv[] array of arguments
  * @return 0 when finished
  */
+#ifdef RUN
+#ifndef TEST
 int main(int argc, char* argv[]) {
 
   int N = 200;
@@ -223,3 +228,9 @@ int main(int argc, char* argv[]) {
   free(star);
   return 0;
 }
+#endif
+#endif
+
+#ifdef TEST
+#include "testsme/nbodyUnittest.c"
+#endif
