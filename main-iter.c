@@ -14,6 +14,11 @@
 
 #define prec float
 
+/**
+ * \file
+ * @author Staffan Edstrom, Magnus Muhr
+ */
+
 static prec gdt = 0.001;
 
 typedef struct {
