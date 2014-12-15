@@ -1,0 +1,12 @@
+10, Biomedicinskt centrum, Akademiska sodra, 3
+10, Akademiska sodra, Centralstationen, 5
+10, Centralstationen, Vaksala torg, 4
+10, Vaksala torg, Granby Centrum, 6
+11, Centralstationen, Stora Torget, 2
+11, Stora Torget, Gottsundavagen, 12
+11, Gottsundavagen, Langvagen, 7
+11, Langvagen, Cellovagen, 4
+13, Gottsunda Centrum, Kalle Anka, 3
+11, Cellovagen, Gottsunda Centrum, 5
+10, Centralstationen, Staffan, 1
+10, Staffan, Cellovagen, 7
