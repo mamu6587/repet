@@ -12,6 +12,18 @@ typedef struct edgedata {
   void* next;
 } edgedata;
 
+typedef struct edgetime {
+  int hours;
+  int minutes;
+  void* next;
+} edgetime;
+
+typedef struct busstart {
+  int line;
+  edgetime* times;
+  void* next
+} busstart;
+
 typedef struct node {
   char* name;
   void* edge;
@@ -19,9 +31,11 @@ typedef struct node {
 } node;
 
 node* root;
-node* visited;
+node* timetable = NULL;
+
 FILE* fp;
-char inputFileName[] = "nat.txt";
+char timetableFileName[] = "start.txt";
+char inputFileName[] = "natverk.txt";
 char c;
 
 node* getLastNode(node* start) {
@@ -60,7 +74,10 @@ node* newNode(node** list, char* name) {
   while(length != 0) {
     if(!isalpha(finalName[length]) && finalName[length] != ' ') {
       //printf("en fuling hittad: %c - på plats %d\n", finalName[length], length);
-      finalName[length] = '\0';
+      if(finalName[length] != '/' && 
+         finalName[length] != '-') {
+        finalName[length] = '\0';
+      }
     }
     length--;
   }
@@ -166,6 +183,68 @@ void prependEdge(node* node, short line, short time, char* busstop) {
   }
 }
 
+
+void addTime(busstart* busline, int hour, int min) {
+  edgetime* newTime = malloc(sizeof(edgetime));
+  newTime->hours = hour;
+  newTime->minutes = min;
+  newTime->next = NULL;
+  if(busline->times != NULL) {
+    edgetime* tempTime = busline->times;
+    while(tempTime->next != NULL) {
+      tempTime = tempTime->next;
+    }
+    tempTime->next = newTime;
+  } else {
+    busline->times = newTime;
+  }
+}
+
+void addStartTime(node* node, int line, int hour, int min) {
+  int found = 0;
+  busstart* tempBusstart = node->edge;
+  while(tempBusstart != NULL) {
+    if(tempBusstart->line == line) {
+      found = 1;
+    }
+    tempBusstart = tempBusstart->next;
+  }
+  //if found: lagg till starttime
+  if(found == 1) {
+    busstart* lastBusstart = node->edge;
+    while(lastBusstart->next != NULL) {
+      lastBusstart = lastBusstart->next;
+    }
+    addTime(lastBusstart, hour, min);
+    //
+  }
+  //if not found: lagg till en busstart 
+  //och starttime
+  if(found == 0) {
+    //   puts("en ny busstart har");
+    busstart* newBusstart = malloc(sizeof(busstart));
+    addTime(newBusstart, hour, min);
+    // printf("line: %d, node: %p newbusstart: %p\n",
+    //            line, node, newBusstart);
+    newBusstart->line = line;  
+    if(node->edge == NULL) {
+    
+      node->edge = newBusstart;
+      
+      //addTime(newBusstart, hour, min);
+    } else {
+    
+      busstart* lastBusstart = node->edge;
+      while(lastBusstart->next != NULL) {
+        lastBusstart = lastBusstart->next;
+      }
+      lastBusstart->next = newBusstart;
+      // addTime(newBusstart, hour, min);
+    
+    } 
+  }
+}
+
 void initBusStops() {
   fp = fopen(inputFileName, "r");
   int step = 1;
@@ -246,7 +325,7 @@ void initBusStops() {
   fclose(fp);
 }
 
-void possiblePaths(char* from, char* to) {
+void possiblePaths(char* from, char* to, char* arrTime, char* destTime) {
   //kolla om de finns som edge och pa samma linje
   //i varje edge, kör hela funktionen
   //kolla om de är på samma busslinje
@@ -272,7 +351,7 @@ void possiblePaths(char* from, char* to) {
     
       node* secondNode = newNode(&visitedList, edgeNode->name);
       // printf("visited list nxt star pa: %p\n", visitedList->next);
-      searchPath(visitedList, secondNode, toNode, tempEdge->line);
+      searchPath(visitedList, secondNode, toNode, tempEdge->line, arrTime, destTime);
       
     tempEdge = tempEdge->next;
   }
@@ -297,49 +376,246 @@ void printNodeList(int viewConnections, node* list) {
       int i = 1;
       while(tempEdge != NULL) {
         
-        printf("%d >%s line: %d\n", i, ((node*)(tempEdge->node))->name, tempEdge->line);
+        printf("%d, >%s line: %d\n", i, ((node*)(tempEdge->node))->name, tempEdge->line);
         tempEdge = tempEdge->next;
         i++;
         
       }
+
+    } else if (viewConnections == 2) {
+      busstart* tempEdge = tempNode->edge;
+      while(tempEdge != NULL) {
+        printf("%d >", tempEdge->line);
+        edgetime* tempTime = tempEdge->times;
+        while(tempTime != NULL) {
+          printf("%d:%d, ", tempTime->hours, tempTime->minutes);
+          tempTime = tempTime->next;
+        }
+        tempEdge = tempEdge->next;
+        puts(" ");
+      } 
+      
     }
     tempNode = tempNode->next;
   }
 }
 
-void printTravelPath(node* list, int busline) {
+int getTravelTime(node* visitedList, node* from, node* to, int bus, int time) {
+  node* visited = visitedList;
+  if(visited == NULL) {
+    visited = NULL;
+  }
+  int finalCount = 0;
+  int timeCount = time;
+  newNode(&visited, from->name);
+  edgedata* tempEdge = from->edge;
+  while(tempEdge != NULL) {
+    if(tempEdge->line == bus) {
+      node* tempNode = ((node*) tempEdge->node);
+      if(findNode(visited, tempNode->name) == NULL) {
+          newNode(&visited, tempNode->name);
+          timeCount += tempEdge->time;
+          // printf("vi soker i: %s\n", tempNode->name);
+          if(tempNode == to) {
+            finalCount = timeCount;
+            return timeCount;
+          } else {
+            return getTravelTime(visited, tempNode, to, bus, timeCount);
+          }
+        }
+    }
+    tempEdge = tempEdge->next;
+  }
+}
+/**
+ * does what it says it does
+ * 
+ *
+ */
+int timeToMinutes(int hours, int minutes) {
+  int newMins = (60*hours) + minutes;
+  return newMins;
+}
+
+int minsToHours(int minutes) {
+  int newHours = (int) (minutes - (minutes % 60))/60;
+  return newHours;
+}
+
+void printMinsToClock(int finalMins) {
+  char tempHours[3];
+  if(minsToHours(finalMins) < 10) {
+    sprintf(tempHours, "%c%d", '0', minsToHours(finalMins));
+  } else {
+    sprintf(tempHours, "%d", minsToHours(finalMins));
+  }
+  char tempMins[3];
+  if((finalMins % 60) < 10) {
+    sprintf(tempMins, "%c%d", '0', (finalMins % 60));
+  } else {
+    sprintf(tempMins, "%d", (finalMins % 60));
+  }
+  tempHours[2] = '\0';
+  tempMins[2] = '\0';
+  printf("%s:%s", tempHours, tempMins);
+}
+
+void getLeaveTime(node* path, int bus, int travelTime, int leaveHour, int leaveMinute) {
+  node* firstNode = path;
+  node* lastNode = getLastNode(path);
+  node* startNode1 = NULL;
+  node* startNode2 = NULL;
+  node* finalNode = NULL;
+  node* tempNode = timetable;
+  while(tempNode != NULL) {
+    busstart* tempEdge = tempNode->edge;
+    while(tempEdge != NULL) {
+      if(tempEdge->line == bus) {
+        if(startNode1 == NULL) {
+          startNode1 = tempNode;
+        } else {
+          startNode2 = tempNode;
+        }
+      }
+      tempEdge = tempEdge->next;
+    }
+    tempNode = tempNode->next;
+  }
+
+  //Vilken av dessa aker vi da fran?
+  if(!strcmp(firstNode->name, startNode1->name)) {
+    finalNode = startNode1;
+  } else if(!strcmp(firstNode->name, startNode2->name)) {
+    finalNode = startNode2;
+  } else if(!strcmp(lastNode->name, startNode2->name)) {
+    finalNode = startNode1;
+  } else if(!strcmp(lastNode->name, startNode1->name)) {
+    finalNode = startNode2;
+  }
+
+  if(finalNode == NULL) {
+    //Kolla vilken som ar kortast sa vet jag vilken av hallplatserna vi startar fran
+    int from1toStart = getTravelTime(NULL, findNode(root, startNode1->name), findNode(root, firstNode->name), bus, 0);
+    int from1toEnd = getTravelTime(NULL, findNode(root, startNode1->name), findNode(root, lastNode->name), bus, 0);
+    //printf("From1Tostart: %d, from1toend: %d\n", from1toStart, from2toStart);
+    if(from1toStart < from1toEnd) {
+      finalNode = startNode1;
+    } else {
+      finalNode = startNode2;
+    }
+  }
+  int timeToStart = getTravelTime(NULL, findNode(root, finalNode->name), findNode(root, firstNode->name), bus, 0);
+  //tid vi tidigast kan aka:
+  //leaveHour:leaveMinute + timeToStart
+  int newTime = timeToMinutes(leaveHour, leaveMinute+timeToStart);
+  
+  busstart* tempBusstart = ((busstart*) findNode(timetable, finalNode->name)->edge);
+  while(tempBusstart->line != bus) {
+    tempBusstart = tempBusstart->next;
+  }
+  
+  edgetime* tempEdgetime = tempBusstart->times;
+  int finalMins = 0;
+  //Jag vill aka tidigast
+  while(tempEdgetime != NULL) {
+    finalMins = timeToMinutes(tempEdgetime->hours, tempEdgetime->minutes);
+    if(finalMins > newTime) {
+      break;
+    }
+    tempEdgetime = tempEdgetime->next;
+  }
+
+  //Jag vill komma fram senast
+  while(tempEdgetime != NULL) {
+    if(tempEdgetime->next != NULL) {
+      edgetime* nxt = tempEdgetime->next;
+      finalMins = timeToMinutes(nxt->hours, nxt->minutes);
+      printf("jfr ");
+      if(finalMins < newTime) {
+        break;
+      }
+    }
+    tempEdgetime = tempEdgetime->next;
+  }
+
+  //Printa tiden for din hallplats 
+  printf("Bus leaves from %s at ", firstNode->name);
+  printMinsToClock(finalMins);  
+  printf("\n");
+  printf("You will arrive at %s at ", lastNode->name);
+  printMinsToClock(finalMins+travelTime);
+  printf("\n");
+}
+
+void printTravelPath(node* list, int busline, char* leaveTime, char* destTime) {
   printf("\n -- Possible path by bus %d:\n", busline);
   node* tempNode = list;
   int totaltime = 0;
-  int time = 0;
+  node* lastNode;
   while(tempNode != NULL) {
+    int time = 0;
     //get time from here to next
     node* rootNode = findNode(root, tempNode->name);
     edgedata* tempEdge = rootNode->edge;
-
     if(tempNode->next != NULL) {
       while(tempEdge != NULL) {
 
         node* nextRootNode = findNode(root, ((node*)(tempNode->next))->name);
         if(tempEdge->node == nextRootNode) {
           time = tempEdge->time;
-          totaltime += time;
+        }
+
+        if(nextRootNode != NULL) {
+          lastNode = nextRootNode;
         }
         tempEdge = tempEdge->next;
       }
 
       printf("%s \t %d mins\n", tempNode->name, time);
+      totaltime += time;
     } else {
       printf("%s\n", tempNode->name);
     }
-    tempNode = tempNode->next;
+
+      tempNode = tempNode->next;
   }
   puts("--------------------");
   printf("total time: %d mins\n", totaltime);
- 
+  
+  int hours = 0;
+  int minutes = 0;
+  
+  if(strlen(leaveTime) >= 5 || strlen(destTime) >= 5) {
+    char* timeString = malloc(sizeof(char)*5);
+    if(strlen(leaveTime) >= 5) { 
+        timeString = leaveTime; 
+      } else {
+        timeString = destTime;
+      }
+
+    assert(strlen(timeString) == 5);
+    char tempHour[3];
+    memcpy(tempHour, &timeString[0], 2);
+    tempHour[2] = '\0';  
+    char tempMins[3];
+    memcpy(tempMins, &timeString[3], 2);
+    tempMins[2] = '\0';
+    hours = atoi(tempHour);
+    minutes = atoi(tempMins); 
+    // printf("want to leave at, %d:%d\n", hours, minutes);
+  }
+  
+  if(leaveTime != NULL) {
+    getLeaveTime(list, busline, totaltime, hours, minutes);
+  } //else 
+    //if (destTime != 0) {
+      //printf("want to arrive at %s at: %s\n", lastNode->name, destTime);
+    //getDestTime(lastNode, totaltime, destTime);
+  // }
+  
 }
 
-void searchPath(node* visitedList, node* current, node* to, int busline) {
+void searchPath(node* visitedList, node* current, node* to, int busline, char* leaveTime, char* destTime) {
   edgedata* tempEdge = findNode(root, current->name)->edge;
   char* tempName = malloc(sizeof(char)*50);//name of bus stop
   // printf("riding from %p %s, on line %d\n", visitedList, current->name, busline);
@@ -357,13 +633,13 @@ void searchPath(node* visitedList, node* current, node* to, int busline) {
           newNode(&visitedList, tempName);
           // printf("reached goal %p %s Bus line: %d!\n", to, to->name, busline);
           //printa hela listan da
-          printTravelPath(visitedList, busline);
+          printTravelPath(visitedList, busline, leaveTime, destTime);
           //printNodeList(0, visitedList);
         } else {
           strcpy(tempName, edgeNode->name);
           node* searchThisNode = newNode(&visitedList, tempName);
 
-          searchPath(visitedList, searchThisNode, to, tempEdge->line);
+          searchPath(visitedList, searchThisNode, to, tempEdge->line, leaveTime, destTime);
         }
       }
     }
@@ -371,42 +647,98 @@ void searchPath(node* visitedList, node* current, node* to, int busline) {
     tempEdge = tempEdge->next;
    }
   //printNodeList(0, visitedList);
+  free(tempName);
   //free(visitedList);
+}
+
+void initTimeTable() {
+  fp = fopen(timetableFileName, "r");
+  int step = 1;
+  int lastCharWasComma = 0;
+  
+  char* step1 = malloc(sizeof(char)*5); //linje
+  char* tempName = malloc(sizeof(char)*50);//name of bus stop
+  char* step3 = malloc(sizeof(char)*5); //tid*/
+ 
+  while(!feof(fp)) {
+    c = fgetc(fp);
+    if(c != ',' && !lastCharWasComma && c != '\n') {
+      char buf[2];
+      sprintf(buf, "%c", c);
+      switch(step) 
+        {
+        case(1): strcat(step1, buf); break;
+        case(2): strcat(tempName, buf); break;
+        case(3): strcat(step3, buf); break;
+        }
+      lastCharWasComma = 0;
+    }
+    if(c == ',') {
+      step++;
+       lastCharWasComma = 1;
+    } else {
+      lastCharWasComma = 0;
+    }
+
+    if(c == '\n') {
+      node* activeNode;
+
+      int hours = 0;
+      int minutes = 0;
+      int len = strlen(step3);
+      if(len == 4) {
+        while(len > 0) {
+          step3[len] = step3[len-1];
+          len--;
+        }
+        step3[0] = '0';
+      }
+      assert(strlen(step3) == 5);
+      char tempHour[3];
+      memcpy(tempHour, &step3[0], 2);
+      tempHour[2] = '\0';  
+      char tempMins[3];
+      memcpy(tempMins, &step3[3], 2);
+      tempMins[2] = '\0';
+      hours = atoi(tempHour);
+      minutes = atoi(tempMins);
+
+      //try add node
+      if(findNode(timetable, tempName) == NULL) {
+        activeNode = newNode(&timetable, tempName);
+
+        //printf("addar nod: %s %s\n", tempName, step3);
+      } else {
+        activeNode = findNode(timetable, tempName);
+      }
+
+      //try add busnumber
+      //add time;
+
+      addStartTime(activeNode, atoi(step1), hours, minutes);
+
+      step = 1;
+      step1[0] = '\0';
+      tempName[0] = '\0';
+      step3[0] = '\0';
+
+    }
+  
+  }
+  
 }
 
 
 int main()
 {
-   initBusStops();
+  initBusStops();
+  initTimeTable();
 
-
-  // removeNode("Centralstationen");
-  // removeNode("Kalle Anka");
-  //removeNode("Biomedicinskt centrum");
-  //printAllStops();
-  //  node* testrm = findNode(root, "Langvagen");
-  //removeEdge(testrm, "Gottsundavagen");
-  // removeEdge(testrm, "Cellovagen");
+  //printNodeList(1, root);
+  //printNodeList(0, root);
+  //printNodeList(2, timetable);
  
-  
-  printNodeList(1, root);
+  possiblePaths("Centralstationen", "Cellovagen", "16:00", "00:00");
  
-  possiblePaths("Centralstationen", "Cellovagen");
-  
-  
-  
-  
- 
-  // printNodeList(0, visited);
-  
-/*node* tempNode = visited;
-  while(tempNode->next != NULL) {
-    puts("hittade en nod\n");
-    tempNode = tempNode->next;
-    }*/
-
-
-  // newNode("Biomedicinskt centrum");
-  //printf("%p %p\n", findNode(root, "Biomedicinskt centrum"), findNode(root, "Akademiska sodra"));
   return 0;
 }
