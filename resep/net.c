@@ -460,7 +460,7 @@ void printMinsToClock(int finalMins) {
   printf("%s:%s", tempHours, tempMins);
 }
 
-void getLeaveTime(node* path, int bus, int travelTime, int leaveHour, int leaveMinute) {
+void getTimes(node* path, int bus, int travelTime, int hour, int minute, char* action) {
   node* firstNode = path;
   node* lastNode = getLastNode(path);
   node* startNode1 = NULL;
@@ -505,49 +505,65 @@ void getLeaveTime(node* path, int bus, int travelTime, int leaveHour, int leaveM
     }
   }
   int timeToStart = getTravelTime(NULL, findNode(root, finalNode->name), findNode(root, firstNode->name), bus, 0);
+  //printf("mellan %s och %s ar det %d\n", findNode(root, finalNode->name)->name, findNode(root, firstNode->name)->name, timeToStart);
   //tid vi tidigast kan aka:
   //leaveHour:leaveMinute + timeToStart
-  int newTime = timeToMinutes(leaveHour, leaveMinute+timeToStart);
+  int newTime = timeToMinutes(hour, minute+timeToStart);
   
   busstart* tempBusstart = ((busstart*) findNode(timetable, finalNode->name)->edge);
   while(tempBusstart->line != bus) {
     tempBusstart = tempBusstart->next;
   }
   
-  edgetime* tempEdgetime = tempBusstart->times;
+  //I want to leave before XX:XX
+  ///* TODO:  */KONTROLLERA TIDERNA
   int finalMins = 0;
-  //Jag vill aka tidigast
-  while(tempEdgetime != NULL) {
-    finalMins = timeToMinutes(tempEdgetime->hours, tempEdgetime->minutes);
-    if(finalMins > newTime) {
-      break;
-    }
-    tempEdgetime = tempEdgetime->next;
-  }
-
-  //Jag vill komma fram senast
-  while(tempEdgetime != NULL) {
-    if(tempEdgetime->next != NULL) {
-      edgetime* nxt = tempEdgetime->next;
-      finalMins = timeToMinutes(nxt->hours, nxt->minutes);
-      printf("jfr ");
-      if(finalMins < newTime) {
+  if(!strcmp(action, "leave")) {
+    edgetime* tempEdgetime = tempBusstart->times;
+    //Jag vill aka tidigast
+    while(tempEdgetime != NULL) {
+      finalMins = timeToMinutes(tempEdgetime->hours, tempEdgetime->minutes);
+      if(finalMins > newTime) {
         break;
       }
+      tempEdgetime = tempEdgetime->next;
     }
-    tempEdgetime = tempEdgetime->next;
-  }
+    
+    printf("Bus leaves from %s at ", firstNode->name);
+    printMinsToClock(finalMins-timeToStart);  
+    printf("\n");
+    printf("You will arrive at %s at ", lastNode->name);
+    printMinsToClock(finalMins+travelTime-timeToStart);
+    printf("\n");
 
-  //Printa tiden for din hallplats 
-  printf("Bus leaves from %s at ", firstNode->name);
-  printMinsToClock(finalMins);  
-  printf("\n");
-  printf("You will arrive at %s at ", lastNode->name);
-  printMinsToClock(finalMins+travelTime);
-  printf("\n");
+  } else if (!strcmp(action, "arrive")) {
+    //I WANT TO ARRIVE BEFORE XX:XX
+    ///* TODO:  */KONTROLLERA TID , + time to last kanske)
+    edgetime* tempEdgetime = tempBusstart->times;
+    //Jag vill komma fram senast e klar
+    while(tempEdgetime != NULL) {
+      if(tempEdgetime->next != NULL) {
+        edgetime* nxt = tempEdgetime->next;
+        finalMins = timeToMinutes(tempEdgetime->hours, tempEdgetime->minutes);
+        int possible = (timeToMinutes(nxt->hours, nxt->minutes) + travelTime + timeToStart);
+        
+        if((timeToMinutes(nxt->hours, nxt->minutes) + travelTime + timeToStart) > timeToMinutes(hour, minute)) {
+          break;
+        }
+      }
+      tempEdgetime = tempEdgetime->next;
+    }
+    //Printa tiden for din hallplats 
+    printf("Bus leaves from %s at ", firstNode->name);
+    printMinsToClock(finalMins-timeToStart); //+timeToStart  
+    printf("\n");
+    printf("You will arrive at %s at ", lastNode->name);
+    printMinsToClock(finalMins+travelTime-timeToStart); //+timeToStart
+    printf("\n");
+  }
 }
 
-void printTravelPath(node* list, int busline, char* leaveTime, char* destTime) {
+void printTravelPath(node* list, int busline, char* travelTime, char* action) {
   printf("\n -- Possible path by bus %d:\n", busline);
   node* tempNode = list;
   int totaltime = 0;
@@ -580,18 +596,15 @@ void printTravelPath(node* list, int busline, char* leaveTime, char* destTime) {
       tempNode = tempNode->next;
   }
   puts("--------------------");
-  printf("total time: %d mins\n", totaltime);
+  printf("Total time: %d mins\n", totaltime);
   
   int hours = 0;
   int minutes = 0;
   
-  if(strlen(leaveTime) >= 5 || strlen(destTime) >= 5) {
+  if(strlen(travelTime) >= 5) {
     char* timeString = malloc(sizeof(char)*5);
-    if(strlen(leaveTime) >= 5) { 
-        timeString = leaveTime; 
-      } else {
-        timeString = destTime;
-      }
+
+    timeString = travelTime; 
 
     assert(strlen(timeString) == 5);
     char tempHour[3];
@@ -605,17 +618,13 @@ void printTravelPath(node* list, int busline, char* leaveTime, char* destTime) {
     // printf("want to leave at, %d:%d\n", hours, minutes);
   }
   
-  if(leaveTime != NULL) {
-    getLeaveTime(list, busline, totaltime, hours, minutes);
-  } //else 
-    //if (destTime != 0) {
-      //printf("want to arrive at %s at: %s\n", lastNode->name, destTime);
-    //getDestTime(lastNode, totaltime, destTime);
-  // }
+  if(!strcmp(action, "arrive") || !strcmp(action, "arrive")) {
+    getTimes(list, busline, totaltime, hours, minutes, action);
+  }
   
 }
 
-void searchPath(node* visitedList, node* current, node* to, int busline, char* leaveTime, char* destTime) {
+void searchPath(node* visitedList, node* current, node* to, int busline, char* travelTime, char* action) {
   edgedata* tempEdge = findNode(root, current->name)->edge;
   char* tempName = malloc(sizeof(char)*50);//name of bus stop
   // printf("riding from %p %s, on line %d\n", visitedList, current->name, busline);
@@ -633,13 +642,13 @@ void searchPath(node* visitedList, node* current, node* to, int busline, char* l
           newNode(&visitedList, tempName);
           // printf("reached goal %p %s Bus line: %d!\n", to, to->name, busline);
           //printa hela listan da
-          printTravelPath(visitedList, busline, leaveTime, destTime);
+          printTravelPath(visitedList, busline, travelTime, action);
           //printNodeList(0, visitedList);
         } else {
           strcpy(tempName, edgeNode->name);
           node* searchThisNode = newNode(&visitedList, tempName);
 
-          searchPath(visitedList, searchThisNode, to, tempEdge->line, leaveTime, destTime);
+          searchPath(visitedList, searchThisNode, to, tempEdge->line, travelTime, action);
         }
       }
     }
@@ -728,17 +737,22 @@ void initTimeTable() {
   
 }
 
-
-int main()
+int main(int argc, char *argv[])
 {
-  initBusStops();
-  initTimeTable();
 
-  //printNodeList(1, root);
-  //printNodeList(0, root);
-  //printNodeList(2, timetable);
- 
-  possiblePaths("Centralstationen", "Cellovagen", "16:00", "00:00");
+  if(argc == 3) {
+    initBusStops();
+    possiblePaths(argv[1], argv[2], "none", "none");
+  } else if(argc == 5) {
+    assert(!strcmp(argv[3], "leave") || !strcmp(argv[3], "arrive"));
+    initBusStops();
+    initTimeTable();
+    possiblePaths(argv[1], argv[2], argv[4], argv[3]);    
+  } else {
+    puts("Invalid arguments. See readme for instructions");
+  }
+
+  //  possiblePaths("Centralstationen", "Cellovagen", "16:00", "leave");
  
   return 0;
 }
