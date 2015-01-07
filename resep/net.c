@@ -538,12 +538,11 @@ void getTimes(node* path, int bus, int travelTime, int hour, int minute, char* a
     tempBusstart = tempBusstart->next;
   }
   
-  //I want to leave before XX:XX
-  ///* TODO:  */KONTROLLERA TIDERNA
+  //I can leave after xx:xx
   int finalMins = 0;
   if(!strcmp(action, "leave")) {
     edgetime* tempEdgetime = tempBusstart->times;
-    //Jag vill aka tidigast
+    //Jag vill aka efter kl xx:xx
     while(tempEdgetime != NULL) {
       finalMins = timeToMinutes(tempEdgetime->hours, tempEdgetime->minutes);
       if(finalMins > newTime) {
@@ -644,7 +643,7 @@ void printTravelPath(node* list, int busline, char* travelTime, char* action) {
     minutes = atoi(tempMins);
   }
   
-  if(!strcmp(action, "arrive") || !strcmp(action, "arrive")) {
+  if(!strcmp(action, "arrive") || !strcmp(action, "leave")) {
     getTimes(list, busline, totaltime, hours, minutes, action);
   }
 }
