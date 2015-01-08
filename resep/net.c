@@ -3,32 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
-//#include "gl.h" ?!?!
-
-typedef struct edgedata {
-  void* node;
-  int line;
-  int time;
-  void* next;
-} edgedata;
-
-typedef struct edgetime {
-  int hours;
-  int minutes;
-  void* next;
-} edgetime;
-
-typedef struct busstart {
-  int line;
-  edgetime* times;
-  void* next
-} busstart;
-
-typedef struct node {
-  char* name;
-  void* edge;
-  void* next;
-} node;
+#include "graphlib.h"
 
 node* root;
 node* timetable = NULL;
@@ -37,19 +12,6 @@ FILE* fp;
 char timetableFileName[] = "start.txt";
 char inputFileName[] = "natverk.txt";
 char c;
-
-/**
-  Gets the last node of a node list
-  @param start of linked node list
-  @return last node of list
- */
-node* getLastNode(node* start) {
-  node* tempNode = start;
-  while(tempNode->next != NULL) {
-    tempNode = tempNode->next;
-  }     
-  return tempNode;
-}
 
 /**
    Gets the last edgedata of an edge list
@@ -868,8 +830,7 @@ void freeTimeTable() {
    @param argv array of arguments
    @return 0
  */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   if(argc == 3) {
     initBusStops();
     initTimeTable();
