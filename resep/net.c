@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
+#include "net.h"
 #include "graphlib.h"
 
 /**
