@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include "graphlib.h"
 
+/**
+ * @file graphlib.c
+ * @author Staffan Edstrom, Magnus Muhr
+ */
+
 node* root;
 
 /**

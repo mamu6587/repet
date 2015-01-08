@@ -1,5 +1,9 @@
 #include <stdlib.h>
 
+/**
+ * @file graphlib.h
+ * @author Staffan Edstrom, Magnus Muhr
+ */
 
 #ifndef _GRAPHLIB_H_
 #define _GRAPHLIB_H_

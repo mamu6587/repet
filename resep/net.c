@@ -5,6 +5,11 @@
 #include <assert.h>
 #include "graphlib.h"
 
+/**
+ * @file net.c
+ * @author Staffan Edstrom, Magnus Muhr
+ */
+
 node* root;
 node* timetable = NULL;
 
@@ -14,7 +19,7 @@ char inputFileName[] = "natverk.txt";
 char c;
 
 /**
-   Initializes list of bus stops from provided file over the
+   @brief Initializes list of bus stops from provided file over the
    bus network. Also adds edge data containing information about
    the node's neighbours. 
    The start node of the list is called 'root'
